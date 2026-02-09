@@ -1,0 +1,8 @@
+api/vendor
+api/node_modules
+api/.env
+.git
+.gitignore
+*.md
+.env
+.env.*
