@@ -12,11 +12,16 @@ class AuthController extends Controller
 {
     public function register(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nome' => ['required', 'string', 'max:100'],
-            'login' => ['required', 'string', 'max:100', 'unique:usuarios,login'],
-            'senha' => ['required', 'string', 'min:6', 'confirmed'],
-        ]);
+        $validated = $request->validate(
+            [
+                'nome' => ['required', 'string', 'max:100'],
+                'login' => ['required', 'string', 'max:100', 'unique:usuarios,login'],
+                'senha' => ['required', 'string', 'min:6', 'confirmed'],
+            ],
+            [
+                'login.unique' => 'Usuário já existe',
+            ]
+        );
 
         $user = User::create([
             'nome' => $validated['nome'],
