@@ -1,0 +1,10 @@
+{
+    "id": 1,
+    "id_usuarios": 1,
+    "id_categorias": 1,
+    "nome": "Receita Mock",
+    "tempo_preparo_minutos": 30,
+    "porcoes": 4,
+    "modo_preparo": "Modo de preparo mock.",
+    "ingredientes": "Ingredientes mock."
+}
