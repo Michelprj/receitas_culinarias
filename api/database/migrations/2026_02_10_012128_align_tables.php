@@ -9,6 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
         Schema::table('receitas', function (Blueprint $table) {
             $table->dropForeign(['id_usuarios']);
             $table->dropForeign(['id_categorias']);
@@ -37,6 +41,9 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (Schema::getConnection()->getDriverName() !== 'mysql') {
+            return;
+        }
 
         Schema::table('receitas', function (Blueprint $table) {
             $table->dropForeign(['id_usuarios']);
