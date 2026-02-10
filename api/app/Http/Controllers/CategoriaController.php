@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categoria;
+use App\Contracts\CategoriaService;
 use Illuminate\Http\JsonResponse;
 
 class CategoriaController extends Controller
 {
+    public function __construct(private readonly CategoriaService $categoriaService)
+    {
+    }
+
     /**
      * @OA\Get(
      *     path="/categorias",
@@ -19,8 +23,6 @@ class CategoriaController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categorias = Categoria::orderBy('nome')->get(['id', 'nome']);
-
-        return response()->json($categorias);
+        return response()->json($this->categoriaService->listAll());
     }
 }

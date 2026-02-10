@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Receita;
+use App\Contracts\ReceitaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ReceitaController extends Controller
 {
+    public function __construct(private readonly ReceitaService $receitaService)
+    {
+    }
+
     /**
      * @OA\Get(
      *     path="/receitas",
@@ -23,24 +27,11 @@ class ReceitaController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Receita::query()
-            ->where('id_usuarios', $request->user()->id)
-            ->with('categoria:id,nome');
-
-        if ($request->filled('q')) {
-            $termo = $request->input('q');
-            $query->where(function ($q) use ($termo) {
-                $q->where('nome', 'like', "%{$termo}%")
-                    ->orWhere('ingredientes', 'like', "%{$termo}%")
-                    ->orWhere('modo_preparo', 'like', "%{$termo}%");
-            });
-        }
-
-        if ($request->filled('categoria_id')) {
-            $query->where('id_categorias', $request->input('categoria_id'));
-        }
-
-        $receitas = $query->orderByDesc('criado_em')->paginate(15);
+        $receitas = $this->receitaService->listForUser(
+            (int) $request->user()->id,
+            $request->filled('q') ? (string) $request->input('q') : null,
+            $request->filled('categoria_id') ? (int) $request->input('categoria_id') : null
+        );
 
         return response()->json($receitas);
     }
@@ -71,7 +62,7 @@ class ReceitaController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'id_categorias' => ['required', 'integer', 'exists:categorias,id'],
+            'id_categorias' => ['required', 'integer'],
             'nome' => ['required', 'string', 'max:45'],
             'tempo_preparo_minutos' => ['required', 'integer', 'min:1'],
             'porcoes' => ['required', 'integer', 'min:1'],
@@ -79,12 +70,12 @@ class ReceitaController extends Controller
             'ingredientes' => ['required', 'string'],
         ]);
 
-        $receita = Receita::create([
-            ...$validated,
-            'id_usuarios' => $request->user()->id,
-        ]);
+        $this->receitaService->assertCategoriaExists((int) $validated['id_categorias']);
 
-        $receita->load('categoria:id,nome');
+        $receita = $this->receitaService->createForUser(
+            (int) $request->user()->id,
+            $validated
+        );
 
         return response()->json($receita, 201);
     }
@@ -101,10 +92,12 @@ class ReceitaController extends Controller
      *     @OA\Response(response=404, description="Receita não encontrada")
      * )
      */
-    public function show(Request $request, Receita $receita): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
-        $this->authorizeReceita($request, $receita);
-        $receita->load('categoria:id,nome');
+        $receita = $this->receitaService->findForUser((int) $request->user()->id, $id);
+        if (! $receita) {
+            abort(404);
+        }
 
         return response()->json($receita);
     }
@@ -132,12 +125,10 @@ class ReceitaController extends Controller
      *     @OA\Response(response=404, description="Receita não encontrada")
      * )
      */
-    public function update(Request $request, Receita $receita): JsonResponse
+    public function update(Request $request, int $id): JsonResponse
     {
-        $this->authorizeReceita($request, $receita);
-
         $validated = $request->validate([
-            'id_categorias' => ['sometimes', 'integer', 'exists:categorias,id'],
+            'id_categorias' => ['sometimes', 'integer'],
             'nome' => ['sometimes', 'string', 'max:45'],
             'tempo_preparo_minutos' => ['sometimes', 'integer', 'min:1'],
             'porcoes' => ['sometimes', 'integer', 'min:1'],
@@ -145,8 +136,19 @@ class ReceitaController extends Controller
             'ingredientes' => ['sometimes', 'string'],
         ]);
 
-        $receita->update($validated);
-        $receita->load('categoria:id,nome');
+        if (array_key_exists('id_categorias', $validated)) {
+            $this->receitaService->assertCategoriaExists((int) $validated['id_categorias']);
+        }
+
+        $receita = $this->receitaService->updateForUser(
+            (int) $request->user()->id,
+            $id,
+            $validated
+        );
+
+        if (! $receita) {
+            abort(404);
+        }
 
         return response()->json($receita);
     }
@@ -163,18 +165,13 @@ class ReceitaController extends Controller
      *     @OA\Response(response=404, description="Receita não encontrada")
      * )
      */
-    public function destroy(Request $request, Receita $receita): JsonResponse
+    public function destroy(Request $request, int $id): JsonResponse
     {
-        $this->authorizeReceita($request, $receita);
-        $receita->delete();
-
-        return response()->json(['message' => 'Receita excluída com sucesso.']);
-    }
-
-    private function authorizeReceita(Request $request, Receita $receita): void
-    {
-        if ($receita->id_usuarios !== (int) $request->user()->id) {
+        $deleted = $this->receitaService->deleteForUser((int) $request->user()->id, $id);
+        if (! $deleted) {
             abort(404);
         }
+
+        return response()->json(['message' => 'Receita excluída com sucesso.']);
     }
 }
