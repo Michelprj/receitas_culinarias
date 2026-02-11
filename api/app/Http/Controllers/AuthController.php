@@ -34,11 +34,22 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'nome' => ['required', 'string', 'max:100'],
-            'login' => ['required', 'string', 'max:100'],
-            'senha' => ['required', 'string', 'min:6', 'confirmed'],
-        ]);
+        $validated = $request->validate(
+            [
+                'nome' => ['required', 'string', 'max:100'],
+                'login' => ['required', 'string', 'max:100'],
+                'senha' => ['required', 'string', 'min:6', 'confirmed'],
+            ],
+            [
+                'nome.required' => 'O nome é obrigatório.',
+                'nome.max' => 'O nome deve ter no máximo 100 caracteres.',
+                'login.required' => 'O e-mail ou login é obrigatório.',
+                'login.max' => 'O login deve ter no máximo 100 caracteres.',
+                'senha.required' => 'A senha é obrigatória.',
+                'senha.min' => 'A senha deve ter pelo menos 6 caracteres.',
+                'senha.confirmed' => 'A confirmação de senha não confere.',
+            ]
+        );
 
         return response()->json($this->authService->register($validated), 201);
     }
@@ -63,10 +74,16 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        $request->validate([
-            'login' => ['required', 'string'],
-            'senha' => ['required', 'string'],
-        ]);
+        $request->validate(
+            [
+                'login' => ['required', 'string'],
+                'senha' => ['required', 'string'],
+            ],
+            [
+                'login.required' => 'O e-mail ou login é obrigatório.',
+                'senha.required' => 'A senha é obrigatória.',
+            ]
+        );
 
         return response()->json(
             $this->authService->login(
