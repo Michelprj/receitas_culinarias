@@ -49,6 +49,24 @@ services:
     networks:
       - receitas
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: receitas_frontend
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: ""
+      VITE_API_PROXY_TARGET: http://api:8000
+    depends_on:
+      - api
+    networks:
+      - receitas
+
 networks:
   receitas:
     driver: bridge
