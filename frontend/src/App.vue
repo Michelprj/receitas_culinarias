@@ -1,9 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ToastContainer } from '@/components/Toast'
+</script>
 
 <template>
-  <div class="min-h-screen p-8">
-    <h1 class="text-2xl font-semibold mb-4">Receitas Culinárias</h1>
+  <div class="min-h-screen">
+    <RouterView />
+    <ToastContainer />
   </div>
 </template>
-
-<style scoped></style>
