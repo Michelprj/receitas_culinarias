@@ -100,6 +100,10 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+.font-brand {
+  font-family: 'Aclonica', sans-serif;
+}
+
 /* Estilos base da aplicação */
 body {
   @apply bg-background text-foreground antialiased;
