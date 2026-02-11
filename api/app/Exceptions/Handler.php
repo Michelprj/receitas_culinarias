@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -30,10 +31,21 @@ class Handler extends ExceptionHandler
 
         $this->renderable(function (ValidationException $e, $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
+                $errors = $e->errors();
+                $firstMessage = collect($errors)->flatten()->first();
+
                 return response()->json([
-                    'message' => 'Erro ao processar a requisição.',
-                    'errors' => $e->errors(),
-                ], 400);
+                    'message' => is_string($firstMessage) ? $firstMessage : 'Erro de validação.',
+                    'errors' => $errors,
+                ], 422);
+            }
+        });
+
+        $this->renderable(function (HttpException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'Erro na requisição.',
+                ], $e->getStatusCode());
             }
         });
     }
