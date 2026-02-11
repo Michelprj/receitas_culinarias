@@ -1,22 +1,31 @@
-/**
- * URL base da API.
- * - Com proxy do Vite (dev): use '' para chamadas relativas (/api/...).
- * - Sem proxy (ex.: build): use VITE_API_URL (ex.: http://localhost:8000).
- */
-export const apiBaseUrl =
+import axios from 'axios'
+
+const apiBaseUrl =
   import.meta.env.VITE_API_URL?.replace(/\/$/, '') ?? ''
 
-/**
- * Faz uma requisição para a API. Use caminhos como '/api/receitas'.
- */
-export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  const url = path.startsWith('http') ? path : `${apiBaseUrl}${path}`
-  return fetch(url, {
-    ...init,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...init?.headers,
-    },
-  })
+export const api = axios.create({
+  baseURL: apiBaseUrl || undefined,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+})
+
+let bearerToken: string | null = null
+
+export function setToken(token: string | null): void {
+  bearerToken = token
 }
+
+export function getToken(): string | null {
+  return bearerToken
+}
+
+api.interceptors.request.use((config) => {
+  if (bearerToken) {
+    config.headers.Authorization = `Bearer ${bearerToken}`
+  }
+  return config
+})
+
+export default api
