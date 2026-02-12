@@ -127,7 +127,7 @@ function toggleCadastroSenhaConfirmation() {
           Bem-vindo ao <span class="font-brand">RECEITACERTA!</span>
         </h1>
         <p class="text-lg text-white/90">
-          Entre ou cadastre-se para guardar suas receitas e descobrir novos sabores.
+          Entre ou cadastre-se para guardar suas receitas.
         </p>
       </div>
     </aside>
@@ -143,7 +143,7 @@ function toggleCadastroSenhaConfirmation() {
           Bem-vindo ao <span class="font-brand text-app-brand">RECEITACERTA!</span>
         </h1>
         <p class="text-sm text-muted-foreground">
-          Entre ou cadastre-se para guardar suas receitas e descobrir novos sabores.
+          Entre ou cadastre-se para guardar suas receitas.
         </p>
       </header>
 
