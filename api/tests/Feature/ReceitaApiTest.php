@@ -134,7 +134,7 @@ class ReceitaApiTest extends TestCase
         $response = $this->postJson('/api/receitas', $payload);
 
         // Assert
-        $response->assertStatus(400)
+        $response->assertStatus(422)
             ->assertJsonStructure(['message', 'errors']);
     }
 

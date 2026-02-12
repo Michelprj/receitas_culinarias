@@ -56,7 +56,7 @@ class AuthApiTest extends TestCase
         $response = $this->postJson('/api/register', $payload);
 
         // Assert
-        $response->assertStatus(400)
+        $response->assertStatus(422)
             ->assertJsonPath('errors.login.0', 'Usuário já existe');
     }
 
@@ -74,7 +74,7 @@ class AuthApiTest extends TestCase
         $response = $this->postJson('/api/register', $payload);
 
         // Assert
-        $response->assertStatus(400)
+        $response->assertStatus(422)
             ->assertJsonStructure(['message', 'errors']);
     }
 
@@ -124,7 +124,7 @@ class AuthApiTest extends TestCase
         ]);
 
         // Assert
-        $response->assertStatus(400)
+        $response->assertStatus(422)
             ->assertJsonStructure(['message', 'errors']);
     }
 
