@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
 import { useToastStore } from '@/stores/toast'
 
@@ -45,10 +46,7 @@ function variantClasses(variant: string) {
             :aria-label="'Fechar notificação'"
             @click="toastStore.removeToast(toast.id)"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
+            <XMarkIcon class="size-4" />
           </button>
         </div>
       </div>
