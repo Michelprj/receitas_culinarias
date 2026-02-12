@@ -11,6 +11,9 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-app-primary: var(--app-primary);
+  --color-app-primary-foreground: var(--app-primary-foreground);
+  --color-app-brand: var(--app-brand);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -33,6 +36,11 @@
 
 :root {
   --radius: 0.625rem;
+  /* Cores primárias do app (botões principais) */
+  --app-primary: #2a2c41;
+  --app-primary-foreground: #ff8c6d;
+  /* Cor de marca (logo, destaques) */
+  --app-brand: #ff724c;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
