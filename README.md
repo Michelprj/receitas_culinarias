@@ -160,8 +160,6 @@ frontend/
 │   ├── App.vue
 │   ├── main.ts
 │   └── style.css
-├── cypress/               # Testes E2E
-├── __tests__/             # Testes unitários (Vitest)
 ├── .env.example
 ├── index.html
 ├── package.json
@@ -194,8 +192,6 @@ frontend/
 | API    | `php artisan test`    | Testes PHPUnit |
 | Front  | `npm run dev`         | Dev server (Vite) |
 | Front  | `npm run build`       | Build de produção |
-| Front  | `npm run test:unit`   | Testes unitários (Vitest) |
-| Front  | `npm run test:e2e`    | Testes E2E (Cypress) |
 
 ### Endpoints principais da API
 
