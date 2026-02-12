@@ -40,6 +40,12 @@ class EloquentAuthService implements AuthService
     {
         $user = User::query()->where('login', $login)->first();
 
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'login' => ['Usuário não encontrado'],
+            ]);
+        }
+
         if (! $user || ! Hash::check($senha, (string) $user->senha)) {
             throw ValidationException::withMessages([
                 'login' => [__('auth.failed')],
