@@ -30,3 +30,15 @@ export function logout() {
 export function getCurrentUser() {
   return api.get<User>('/api/user')
 }
+
+export interface UpdateProfileParams {
+  nome?: string
+  login?: string
+  senha_atual?: string
+  nova_senha?: string
+  nova_senha_confirmation?: string
+}
+
+export function updateProfile(params: UpdateProfileParams) {
+  return api.patch<User>('/api/user', params)
+}

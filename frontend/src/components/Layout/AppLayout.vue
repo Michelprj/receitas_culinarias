@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline'
+import { ArrowRightOnRectangleIcon, UserCircleIcon } from '@heroicons/vue/24/outline'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { Button } from '@/components/ui/button'
@@ -26,7 +26,14 @@ async function handleLogout() {
           <span class="font-brand text-app-brand text-lg font-bold">RECEITACERTA</span>
         </router-link>
         <div class="flex items-center gap-3">
-          <span class="text-sm text-muted-foreground hidden sm:inline">{{ authStore.user?.nome }}</span>
+          <router-link
+            to="/perfil"
+            class="flex items-center gap-1.5 rounded text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Meu perfil"
+          >
+            <UserCircleIcon class="size-5 shrink-0" />
+            <span class="hidden sm:inline">{{ authStore.user?.nome }}</span>
+          </router-link>
           <Button variant="outline" size="sm" aria-label="Sair" @click="handleLogout">
             <ArrowRightOnRectangleIcon class="size-4" />
             Sair

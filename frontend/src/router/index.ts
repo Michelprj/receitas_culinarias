@@ -41,6 +41,11 @@ const router = createRouter({
           name: 'receitas-editar',
           component: () => import('../views/ReceitaFormView.vue'),
         },
+        {
+          path: 'perfil',
+          name: 'perfil',
+          component: () => import('../views/ProfileView.vue'),
+        },
       ],
     },
   ],

@@ -52,6 +52,12 @@ export const useAuthStore = defineStore('auth', () => {
     return authApi.logout()
   }
 
+  async function updateProfile(params: { nome?: string; login?: string; senha_atual?: string; nova_senha?: string; nova_senha_confirmation?: string }) {
+    const { data } = await authApi.updateProfile(params)
+    user.value = data ? { id: data.id, nome: data.nome, login: data.login } : null
+    return data
+  }
+
   /** Restaura a sessão a partir do localStorage (chamar na inicialização do app). */
   async function init() {
     try {
@@ -81,6 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    updateProfile,
     setAuth,
     init,
   }
