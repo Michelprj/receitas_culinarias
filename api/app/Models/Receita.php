@@ -20,7 +20,10 @@ class Receita extends Model
         'porcoes',
         'modo_preparo',
         'ingredientes',
+        'foto',
     ];
+
+    protected $appends = ['foto_url'];
 
     protected $casts = [
         'criado_em' => 'datetime',
@@ -35,5 +38,14 @@ class Receita extends Model
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class, 'id_categorias');
+    }
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        if (! $this->foto) {
+            return null;
+        }
+
+        return '/storage/'.ltrim($this->foto, '/');
     }
 }

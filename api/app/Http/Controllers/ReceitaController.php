@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\ReceitaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ReceitaController extends Controller
 {
@@ -68,14 +69,29 @@ class ReceitaController extends Controller
             'porcoes' => ['required', 'integer', 'min:1'],
             'modo_preparo' => ['required', 'string'],
             'ingredientes' => ['required', 'string'],
+            'foto' => ['nullable', 'file', 'mimes:jpeg,jpg,png,gif,webp,bmp', 'max:2048'],
         ]);
 
         $this->receitaService->assertCategoriaExists((int) $validated['id_categorias']);
 
+        unset($validated['foto']);
         $receita = $this->receitaService->createForUser(
             (int) $request->user()->id,
             $validated
         );
+
+        if ($request->hasFile('foto')) {
+            Storage::disk('public')->makeDirectory('receitas');
+            $path = $request->file('foto')->store('receitas', 'public');
+            $updated = $this->receitaService->updateForUser(
+                (int) $request->user()->id,
+                (int) $receita['id'],
+                ['foto' => $path]
+            );
+            if ($updated) {
+                $receita = $updated;
+            }
+        }
 
         return response()->json($receita, 201);
     }
@@ -134,10 +150,29 @@ class ReceitaController extends Controller
             'porcoes' => ['sometimes', 'integer', 'min:1'],
             'modo_preparo' => ['sometimes', 'string'],
             'ingredientes' => ['sometimes', 'string'],
-        ]);
+            'foto' => ['nullable', 'file', 'mimes:jpeg,jpg,png,gif,webp,bmp', 'max:2048'],
+        ],
+        [
+            'nome.max' => 'O nome da receita deve ter no máximo 45 caracteres.',
+            'tempo_preparo_minutos.min' => 'O tempo de preparo deve ser maior que 0.',
+            'porcoes.min' => 'O número de porções deve ser maior que 0.',
+            'foto.image' => 'A foto deve ser uma imagem.',
+            'foto.max' => 'A foto deve ter no máximo 2 MB.',
+        ]
+    );
 
         if (array_key_exists('id_categorias', $validated)) {
             $this->receitaService->assertCategoriaExists((int) $validated['id_categorias']);
+        }
+
+        unset($validated['foto']);
+        if ($request->hasFile('foto')) {
+            Storage::disk('public')->makeDirectory('receitas');
+            $current = $this->receitaService->findForUser((int) $request->user()->id, $id);
+            if ($current && ! empty($current['foto'])) {
+                Storage::disk('public')->delete($current['foto']);
+            }
+            $validated['foto'] = $request->file('foto')->store('receitas', 'public');
         }
 
         $receita = $this->receitaService->updateForUser(
