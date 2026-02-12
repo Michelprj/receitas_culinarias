@@ -205,4 +205,6 @@ frontend/
 
 Todos os detalhes e schemas estão na **documentação Swagger**: http://localhost:8000/api/documentation.
 
+Figma com as telas desenhadas: https://www.figma.com/design/Yu64JHgJHKgiwCvMupVStJ/Receitas-culin%C3%A1rias?node-id=0-1&t=XWzP8uBmWqbsj8kY-1
+
 ---
