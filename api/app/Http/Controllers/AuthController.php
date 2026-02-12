@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -134,4 +135,79 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/user",
+     *     tags={"Auth"},
+     *     summary="Atualizar perfil",
+     *     description="Atualiza nome, login e/ou senha do usuário autenticado.",
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="nome", type="string", example="Maria Silva"),
+     *             @OA\Property(property="login", type="string", example="maria"),
+     *             @OA\Property(property="senha_atual", type="string", format="password"),
+     *             @OA\Property(property="nova_senha", type="string", format="password"),
+     *             @OA\Property(property="nova_senha_confirmation", type="string", format="password")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Perfil atualizado"),
+     *     @OA\Response(response=400, description="Erro de validação")
+     * )
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $rules = [
+            'nome' => ['sometimes', 'required', 'string', 'max:100'],
+            'login' => ['sometimes', 'required', 'string', 'max:100', 'unique:usuarios,login,'.$user->id],
+        ];
+
+        $messages = [
+            'nome.required' => 'O nome é obrigatório.',
+            'nome.max' => 'O nome deve ter no máximo 100 caracteres.',
+            'login.required' => 'O login é obrigatório.',
+            'login.max' => 'O login deve ter no máximo 100 caracteres.',
+            'login.unique' => 'Este login já está em uso.',
+        ];
+
+        if ($request->filled('nova_senha')) {
+            $rules['senha_atual'] = ['required', 'string'];
+            $rules['nova_senha'] = ['required', 'string', 'min:6', 'confirmed'];
+            $messages['senha_atual.required'] = 'A senha atual é obrigatória para alterar a senha.';
+            $messages['nova_senha.required'] = 'A nova senha é obrigatória.';
+            $messages['nova_senha.min'] = 'A nova senha deve ter pelo menos 6 caracteres.';
+            $messages['nova_senha.confirmed'] = 'A confirmação da nova senha não confere.';
+        }
+
+        $validated = $request->validate($rules, $messages);
+
+        if (! empty($validated['nova_senha'])) {
+            if (! Hash::check((string) $request->input('senha_atual'), (string) $user->senha)) {
+                return response()->json([
+                    'message' => 'Dados inválidos.',
+                    'errors' => ['senha_atual' => ['A senha atual está incorreta.']],
+                ], 422);
+            }
+        }
+
+        if (array_key_exists('nome', $validated)) {
+            $user->nome = $validated['nome'];
+        }
+        if (array_key_exists('login', $validated)) {
+            $user->login = $validated['login'];
+        }
+        if (! empty($validated['nova_senha'] ?? null)) {
+            $user->senha = $validated['nova_senha'];
+        }
+
+        $user->save();
+
+        return response()->json([
+            'id' => $user->id,
+            'nome' => $user->nome,
+            'login' => $user->login,
+        ]);
+    }
 }
