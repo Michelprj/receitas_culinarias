@@ -25,6 +25,9 @@ api.interceptors.request.use((config) => {
   if (bearerToken) {
     config.headers.Authorization = `Bearer ${bearerToken}`
   }
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type']
+  }
   return config
 })
 

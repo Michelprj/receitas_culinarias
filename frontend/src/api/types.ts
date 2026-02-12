@@ -22,6 +22,8 @@ export interface Receita {
   porcoes: number
   modo_preparo: string
   ingredientes: string
+  foto?: string | null
+  foto_url?: string | null
   criado_em?: string
   alterado_em?: string
 }
