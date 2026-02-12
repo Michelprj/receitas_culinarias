@@ -1,5 +1,5 @@
 import { api, setToken } from '@/api/client'
-import type { AuthResponse } from '@/api/types'
+import type { AuthResponse, User } from '@/api/types'
 
 export interface LoginParams {
   login: string
@@ -25,4 +25,8 @@ export function logout() {
   return api.post<{ message: string }>('/api/logout').finally(() => {
     setToken(null)
   })
+}
+
+export function getCurrentUser() {
+  return api.get<User>('/api/user')
 }
